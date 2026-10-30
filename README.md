@@ -2,7 +2,8 @@
 
 <div align="center">
 
-**Turn Any Server-Side CLI Tool or AI Agent into a Zero-Install Web Workspace**
+**Turn Any Machine Where Your Favorite CLI Agents Live into a Personal Web Workspace**  
+*No need to build complex Feishu, Slack, or WeChat bots. Wherever your tuned CLI agents reside, expose them directly as an elegant, browser-accessible deck.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node: >=18](https://img.shields.io/badge/Node->=18-brightgreen.svg)](https://nodejs.org)
@@ -14,40 +15,90 @@
 
 ---
 
-## 💡 Why CLI Web Deck?
+## 💡 The Core Idea: What Are We Really Doing?
 
-### Motivation: Zero-Install Lightweight Computing
-When working across different devices — such as ultrabooks, tablets, temporary travel laptops, or managed office workstations:
-* **Inconvenient to Install Heavy Toolchains**: Setting up dedicated Python environments, Node.js runtimes, CUDA drivers, Docker, or complex AI CLI agent toolchains on every client device is cumbersome, time-consuming, or sometimes restricted by local device policies.
-* **Separation of Compute and Display**: Your heavy compute, API keys, and model environments reside on your remote server or cloud VPS, but traditional remote tools lack modern web ergonomics like bidirectional drag-and-drop file transfers.
-* **Session Persistence**: Long-running computational jobs, model planning sessions, or batch scripts can easily get disrupted when a laptop sleeps or changes Wi-Fi networks.
+Most developers and power users have a **trusted primary machine** — whether it's a powerful home desktop, an office workstation, or a cloud server. That machine holds your favorite tools, your tuned AI CLI agents (like Claude Code, Kimi CLI, MiniMax Code, Aider, Python analysis scripts), your environment variables, and your secret API keys.
 
-### The Solution
-**“One remote machine, accessible from any browser with zero local installation.”**
+When you are away from that machine (traveling with a light laptop, on an iPad, or working at another client PC), how do you reach your powerful tools?
+* **Traditional Bot Integration (Feishu / Slack / WeChat)**: You have to register enterprise developer accounts, configure webhooks, handle message schemas, and live with clumsy file transfers and text-only limits.
+* **Heavy Remote Desktops / VNC**: Laggy, bloated, and inconvenient for keyboard-first CLI workflows.
 
-**CLI Web Deck** bridges your remote server and modern web browsers:
-1. **Instant Browser Access**: No local software installation needed on the client. Just open any modern web browser to interact directly with your server's CLI tools.
-2. **Single-Port Simplicity**: Terminal WebSocket streaming, web UI, and file transfer endpoints are all multiplexed onto **one single HTTP port** (e.g. `8080`), making it trivial to run behind Nginx/Caddy or connect directly via server IP.
-3. **Bidirectional Drag-and-Drop**: Drop datasets, documents, or scripts directly onto the browser window to stream them into your remote workspace; browse and download output reports with a single click.
-4. **Persistent Sessions (`tmux`)**: Background tasks keep executing even if you close the browser tab or disconnect; re-opening the page instantly reconnects to your exact session.
+### The CLI Web Deck Approach
+**“Expose an instant, dedicated Web Channel for the CLI agents living on your machine.”**
+
+Run `cli-web-deck` on the machine where your agents already live, and it turns that environment into an elegant web deck:
+* **No Bot Hassle**: No third-party IM developer accounts, no webhook headaches.
+* **Native Terminal Power**: A full-featured browser terminal supporting rich keyboard shortcuts, cursor controls, and streaming responses.
+* **Bidirectional Drag-and-Drop**: Drag datasets and documents from your current laptop directly into the browser to feed your remote agent. Download generated reports and outputs with a single click.
+* **Session Persistence (`tmux`)**: Close your laptop lid or disconnect Wi-Fi anytime. Your long-running model reasoning or batch scripts keep running in the background.
 
 ---
 
-## ⚡ Key Features
+## 🗺️ Conceptual Architecture & Workflow
 
-* **⚡ Universal CLI Compatibility**: Works with standard shells (`bash`, `zsh`), language REPLs (`python`, `ipython`), and modern AI CLI assistants (`claude`, `kimi`, `minimax`, `aider`, etc.).
-* **🌐 Single-Port Multiplexing**: Eliminates the need to open and manage multiple firewall ports.
-* **📁 Drag & Drop File Transfer**: Seamlessly upload files into the workspace without configuring external FTP/SFTP clients.
-* **📦 Workspace File Explorer**: Built-in collapsible sidebar to inspect file sizes, timestamps, and download outputs.
-* **🔒 Built-in Authentication**: Optional HTTP Basic Auth via `--auth "username:password"`.
-* **🐳 Complete Deployment Ecosystem**: Includes `install.sh`, Dockerfile, Docker Compose, and Systemd unit templates.
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  💻 The Machine Where Your Agents Live (Home PC, Workstation, Server)   │
+│                                                                        │
+│   🤖 Your Tuned CLI Agents & Environments                              │
+│      [ Claude Code ]  [ Kimi CLI ]  [ MiniMax ]  [ Aider ]  [ Python ] │
+│                         │                                              │
+│                         ▼                                              │
+│   🚢 CLI Web Deck (Lightweight Bridge)                                 │
+│      • tmux session persistence (never drops background jobs)          │
+│      • Single-port gateway (terminal WebSocket + bidirectional files)  │
+└─────────────────────────┬──────────────────────────────────────────────┘
+                          │ 🌐 Dedicated Web Channel (Single port, IP or Domain)
+                          ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│  📱 Any Device with a Modern Browser (Laptop, iPad, Any Workstation)   │
+│                                                                        │
+│   🖥️ Modern Web Deck Interface                                         │
+│      • Full terminal interaction from anywhere                         │
+│      • Drag-and-drop file upload directly to remote workspace          │
+│      • Instant one-click downloads for output artifacts                │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Visual Flow (Mermaid)
+
+```mermaid
+flowchart TD
+    subgraph Host ["💻 Host Machine (Where your configured agents & tools live)"]
+        Agent["🤖 Your Favorite CLI Agent / Script\n(Claude / Kimi / MiniMax / Python)"]
+        Deck["🚢 CLI Web Deck\n(Single-Port Gateway + tmux Session Manager)"]
+        Agent <--> Deck
+    end
+
+    subgraph Gateway ["🌐 Dedicated Web Channel (No Feishu/Slack bot setup needed)"]
+        Channel["Single Web Port (HTTP + WebSocket)\nAccessible via Public IP or Domain"]
+    end
+
+    subgraph Client ["📱 Client Device (Zero tools or runtimes needed locally)"]
+        Browser["🖥️ Any Web Browser\n• Native terminal experience\n• Drag-and-drop file uploads\n• Instant download of reports\n• Close tab anytime; jobs keep running"]
+    end
+
+    Deck <==> Channel <==> Browser
+```
+
+---
+
+## ⚡ Comparison: Why Is It Better?
+
+| Dimension | Remote Desktop (VNC/RDP) | IM Bots (Feishu / Slack / WeChat) | 🌟 CLI Web Deck |
+| :--- | :--- | :--- | :--- |
+| **Setup Cost** | Heavy client installation | Complex developer portals, webhooks, auth | **Zero setup**: One command to launch |
+| **Interaction** | Slow, blurry, heavy bandwidth | Limited to chat cards; no full terminal | **Full terminal fidelity**: fast, crisp, keyboard-first |
+| **File Transfer** | Requires separate SFTP/shared folders | Strict file size limits & cloud storage hops | **Drag-and-drop directly into browser**; 1-click downloads |
+| **Port & Network** | Often needs multiple open ports | Requires fixed public domain & HTTPS | **Single port multiplexing** (direct IP or domain) |
+| **Persistence** | Disconnecting can kill active shell | Relies on external bot timeout limits | **tmux backend**: close tab anytime, tasks run 24/7 |
 
 ---
 
 ## 🚀 Quickstart
 
-### 1. Prerequisites
-Ensure `tmux`, `ttyd`, and `Node.js (v18+)` are installed on your server:
+### 1. Prerequisites (On the Host Machine)
+Ensure `tmux`, `ttyd`, and `Node.js (v18+)` are installed on the host where your CLI tool lives:
 ```bash
 # Ubuntu / Debian
 sudo apt update && sudo apt install -y tmux ttyd curl
@@ -56,23 +107,23 @@ sudo apt update && sudo apt install -y tmux ttyd curl
 brew install tmux ttyd
 ```
 
-### 2. Clone and Run
+### 2. Launch Your Web Deck
 ```bash
 git clone https://github.com/HankGuo/cli-web-deck.git
 cd cli-web-deck
 chmod +x ./bin/cli-web-deck
 
-# 1. Basic: Run Linux Bash in browser
+# 1. Expose your standard bash shell
 ./bin/cli-web-deck --cmd "bash" --port 8080
 
-# 2. Run a specific AI CLI in a custom workspace
+# 2. Expose an AI Agent (e.g. Kimi or Claude) with a dedicated workspace
 ./bin/cli-web-deck --cmd "kimi" --port 8010 --workspace ~/my-workspace
 
-# 3. Run Python IPython with basic authentication
+# 3. Add password authentication for public-facing access
 ./bin/cli-web-deck --cmd "python3 -m IPython" --port 8888 --auth "admin:myPassword123"
 ```
 
-Open your browser at `http://<YOUR_SERVER_IP_OR_DOMAIN>:8080`.
+Open `http://<HOST_IP_OR_DOMAIN>:8080` on any device to start using your agents.
 
 ---
 
@@ -80,17 +131,17 @@ Open your browser at `http://<YOUR_SERVER_IP_OR_DOMAIN>:8080`.
 
 | Flag | Shorthand | Description | Default |
 | :--- | :--- | :--- | :--- |
-| `--cmd` | `-c` | Command to execute in terminal | Current `$SHELL` |
-| `--port` | `-p` | Public port for HTTP/WebSocket traffic | `8080` |
-| `--workspace` | `-w` | Directory for file transfers and execution | Current working dir |
-| `--title` | `-t` | Custom title shown in the web console header | `"CLI Web Deck"` |
-| `--auth` | `-a` | Basic Auth credentials (`user:pass`) | `None` (Public) |
-| `--session` | `-s` | Identifier for the underlying tmux session | Auto-generated |
-| `--host` | `-h` | Host interface to bind to | `0.0.0.0` |
+| `--cmd` | `-c` | The CLI command to run in terminal | `$SHELL` |
+| `--port` | `-p` | Public port for the Web Deck (single-port) | `8080` |
+| `--workspace` | `-w` | Directory for file uploads and outputs | Current working dir |
+| `--title` | `-t` | Title displayed in the browser header | `"CLI Web Deck"` |
+| `--auth` | `-a` | Basic Auth credentials (`user:password`) | `None` (Public) |
+| `--session` | `-s` | Underlying tmux session identifier | Auto-generated |
+| `--host` | `-h` | Network interface to bind | `0.0.0.0` |
 
 ---
 
-## 🐳 Docker Deployment
+## 🐳 Docker Deployment (Optional)
 
 ```bash
 docker build -t cli-web-deck .
@@ -104,9 +155,9 @@ docker compose -f templates/docker-compose.yml up -d
 
 ---
 
-## 🛡️ Production Deployment (Nginx Reverse Proxy)
+## 🛡️ Production Nginx Reverse Proxy
 
-A ready-to-use template is available in `templates/nginx.conf`:
+A production-ready reverse proxy config is provided in `templates/nginx.conf`:
 ```nginx
 server {
     listen 80;
@@ -129,11 +180,11 @@ server {
 
 ## ⚠️ Security Notice & Disclaimer
 
-1. **Authentication**: When exposing CLI Web Deck to public networks or the Internet, always enable `--auth` or place the service behind a secure reverse proxy with TLS/HTTPS.
-2. **Compliance & Disclaimer**: CLI Web Deck is distributed under the MIT License as an open-source productivity utility. It is intended to streamline remote computing and terminal accessibility across lightweight devices. Users are responsible for adhering to their organization's IT and data security policies when accessing remote hosts. The author(s) assume no liability for misuse.
+* **Credentials**: When exposing CLI Web Deck over public networks, always enable `--auth "user:pass"` or deploy behind a reverse proxy with TLS/HTTPS encryption.
+* **Disclaimer**: CLI Web Deck is an open-source tool released under the MIT License, created to provide convenient web access to existing CLI environments. Users are responsible for complying with their local network and data policies when making services accessible remotely.
 
 ---
 
 ## 📄 License
 
-Released under the [MIT License](LICENSE).
+MIT License © 2026 HankGuo
