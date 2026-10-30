@@ -1,45 +1,50 @@
 # CLI Web Deck 🚀
 
-> **Access Powerful CLI & AI Agents From Any Restrictive Corporate Network — Just One VPS and a Web Browser.**  
-> **突破封闭受限网络，一台 VPS + 任意浏览器即可畅享高级 AI 智能体与终端能力。**
+<div align="center">
 
-[English](#english) | [中文说明 (解决什么痛点？)](#中文说明)
+**Turn Any Server-Side CLI Tool or AI Agent into a Zero-Install Web Workspace**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node: >=18](https://img.shields.io/badge/Node->=18-brightgreen.svg)](https://nodejs.org)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](https://github.com/HankGuo/cli-web-deck/pulls)
+
+**[ 🇺🇸 English ](README.md)** · **[ 🇨🇳 简体中文 ](README.zh-CN.md)**
+
+</div>
 
 ---
 
-<a name="english"></a>
-## 💡 What Problem Does This Solve?
+## 💡 Why CLI Web Deck?
 
-### The Pain Point in Enterprise & Regulated Environments
-In many modern workplaces — financial institutions, pharmaceutical enterprises, hospitals, corporate intranets, and locked-down office machines:
-* **Strict Network Firewalls**: Outbound SSH (`port 22`), custom ports, and VPN tunnels are strictly blocked.
-* **Locked-Down Workstations**: You cannot install Node.js, Python, Git, or modern AI CLI agents (`claude`, `kimi`, `minimax`, `aider`, `gemini-cli`) on your restricted office laptop.
-* **File Transfer Restrictions**: Traditional file transfer tools (`scp`, `sftp`, `ftp`, USB drives) are disabled.
-* **Yet, you have one thing**: **A standard web browser that can access HTTP / HTTPS.**
+### Motivation: Zero-Install Lightweight Computing
+When working across different devices — such as ultrabooks, tablets, temporary travel laptops, or managed office workstations:
+* **Inconvenient to Install Heavy Toolchains**: Setting up dedicated Python environments, Node.js runtimes, CUDA drivers, Docker, or complex AI CLI agent toolchains on every client device is cumbersome, time-consuming, or sometimes restricted by local device policies.
+* **Separation of Compute and Display**: Your heavy compute, API keys, and model environments reside on your remote server or cloud VPS, but traditional remote tools lack modern web ergonomics like bidirectional drag-and-drop file transfers.
+* **Session Persistence**: Long-running computational jobs, model planning sessions, or batch scripts can easily get disrupted when a laptop sleeps or changes Wi-Fi networks.
 
 ### The Solution
-**CLI Web Deck** acts as a lightweight, zero-dependency bridge between your remote server and your browser:
-1. **One VPS / Fixed IP is all you need**: Deploy your tools on a cloud VPS or home server.
-2. **Accessible Anywhere**: As long as you can open a browser, you get a full-fledged terminal workspace.
-3. **Single-Port Simplicity**: Terminal WebSocket, web interface, and file upload/download APIs are all multiplexed onto **ONE single port** (e.g. `8080` or `443`). No complex firewall rules.
-4. **Frictionless File Transfer**: Drag and drop input tables, datasets, or documents from your locked-down laptop directly into the remote workspace. Download generated reports, graphs, and artifacts with one click.
-5. **Session Persistence**: Network hiccups or closed browser tabs won't kill your tasks. Behind the scenes, `tmux` keeps your AI agents and scripts running 24/7.
+**“One remote machine, accessible from any browser with zero local installation.”**
+
+**CLI Web Deck** bridges your remote server and modern web browsers:
+1. **Instant Browser Access**: No local software installation needed on the client. Just open any modern web browser to interact directly with your server's CLI tools.
+2. **Single-Port Simplicity**: Terminal WebSocket streaming, web UI, and file transfer endpoints are all multiplexed onto **one single HTTP port** (e.g. `8080`), making it trivial to run behind Nginx/Caddy or connect directly via server IP.
+3. **Bidirectional Drag-and-Drop**: Drop datasets, documents, or scripts directly onto the browser window to stream them into your remote workspace; browse and download output reports with a single click.
+4. **Persistent Sessions (`tmux`)**: Background tasks keep executing even if you close the browser tab or disconnect; re-opening the page instantly reconnects to your exact session.
 
 ---
 
 ## ⚡ Key Features
 
-* **⚡ Any CLI Command**: If it runs in a terminal, it runs in CLI Web Deck (`bash`, `kimi`, `claude`, `minimax`, `python`, `htop`, etc.).
-* **🌐 Single-Port Multiplexing**: Web UI, WebSocket terminal, and file APIs on one single port. Direct IP (`http://1.2.3.4:8080`) or domain + SSL supported out of the box.
-* **🔄 Persistent Sessions (`tmux`)**: Disconnected? Accidental tab close? Your process keeps running in the background. Reconnecting automatically restores your exact terminal state.
-* **📁 Drag & Drop File Transfer**: Drop files anywhere on the browser window to upload directly into your remote workspace.
-* **📦 Built-in File Explorer & Downloader**: Integrated collapsible file drawer to browse, view file sizes, and download outputs with one click.
-* **🔒 Optional Basic Auth**: Protect public instances with `--auth "user:password"`.
-* **🐳 Docker & Systemd Ready**: Run natively, as a system service, or via Docker Compose.
+* **⚡ Universal CLI Compatibility**: Works with standard shells (`bash`, `zsh`), language REPLs (`python`, `ipython`), and modern AI CLI assistants (`claude`, `kimi`, `minimax`, `aider`, etc.).
+* **🌐 Single-Port Multiplexing**: Eliminates the need to open and manage multiple firewall ports.
+* **📁 Drag & Drop File Transfer**: Seamlessly upload files into the workspace without configuring external FTP/SFTP clients.
+* **📦 Workspace File Explorer**: Built-in collapsible sidebar to inspect file sizes, timestamps, and download outputs.
+* **🔒 Built-in Authentication**: Optional HTTP Basic Auth via `--auth "username:password"`.
+* **🐳 Complete Deployment Ecosystem**: Includes `install.sh`, Dockerfile, Docker Compose, and Systemd unit templates.
 
 ---
 
-## 🚀 Quickstart (Under 1 Minute)
+## 🚀 Quickstart
 
 ### 1. Prerequisites
 Ensure `tmux`, `ttyd`, and `Node.js (v18+)` are installed on your server:
@@ -51,23 +56,23 @@ sudo apt update && sudo apt install -y tmux ttyd curl
 brew install tmux ttyd
 ```
 
-### 2. Run Directly
+### 2. Clone and Run
 ```bash
 git clone https://github.com/HankGuo/cli-web-deck.git
 cd cli-web-deck
 chmod +x ./bin/cli-web-deck
 
-# Run standard bash
+# 1. Basic: Run Linux Bash in browser
 ./bin/cli-web-deck --cmd "bash" --port 8080
 
-# Run an AI CLI or custom tool in a custom workspace
-./bin/cli-web-deck --cmd "kimi" --port 8010 --workspace ~/kimi-workspace
+# 2. Run a specific AI CLI in a custom workspace
+./bin/cli-web-deck --cmd "kimi" --port 8010 --workspace ~/my-workspace
 
-# Run with authentication on a public server IP
-./bin/cli-web-deck --cmd "bash" --port 8080 --auth "admin:mySecretPass"
+# 3. Run Python IPython with basic authentication
+./bin/cli-web-deck --cmd "python3 -m IPython" --port 8888 --auth "admin:myPassword123"
 ```
 
-Open your browser at `http://<YOUR_SERVER_IP>:8080`.
+Open your browser at `http://<YOUR_SERVER_IP_OR_DOMAIN>:8080`.
 
 ---
 
@@ -75,13 +80,13 @@ Open your browser at `http://<YOUR_SERVER_IP>:8080`.
 
 | Flag | Shorthand | Description | Default |
 | :--- | :--- | :--- | :--- |
-| `--cmd` | `-c` | Command to run in terminal | `$SHELL` (bash) |
-| `--port` | `-p` | Public port for Web Console | `8080` |
-| `--workspace` | `-w` | Directory for file uploads and commands | Current dir |
-| `--title` | `-t` | Title displayed in the web header | `"CLI Web Deck"` |
+| `--cmd` | `-c` | Command to execute in terminal | Current `$SHELL` |
+| `--port` | `-p` | Public port for HTTP/WebSocket traffic | `8080` |
+| `--workspace` | `-w` | Directory for file transfers and execution | Current working dir |
+| `--title` | `-t` | Custom title shown in the web console header | `"CLI Web Deck"` |
 | `--auth` | `-a` | Basic Auth credentials (`user:pass`) | `None` (Public) |
-| `--session` | `-s` | Custom tmux session identifier | Auto-generated |
-| `--host` | `-h` | Network interface to bind | `0.0.0.0` |
+| `--session` | `-s` | Identifier for the underlying tmux session | Auto-generated |
+| `--host` | `-h` | Host interface to bind to | `0.0.0.0` |
 
 ---
 
@@ -101,7 +106,7 @@ docker compose -f templates/docker-compose.yml up -d
 
 ## 🛡️ Production Deployment (Nginx Reverse Proxy)
 
-A production-ready reverse proxy template is provided in `templates/nginx.conf`:
+A ready-to-use template is available in `templates/nginx.conf`:
 ```nginx
 server {
     listen 80;
@@ -122,38 +127,13 @@ server {
 
 ---
 
-<a name="中文说明"></a>
-## 🇨🇳 中文说明：解决什么痛点？
+## ⚠️ Security Notice & Disclaimer
 
-### 典型痛点场景
-在很多企业、金融机构、医药临床研发、外企或严格管控的内网办公环境中：
-1. **网络高度封闭**：办公电脑处于受限网络中，企业网关直接屏蔽了 SSH（22端口）、各种自定义端口及传统 VPN 协议。
-2. **终端权限受限**：办公机无法自由安装 Node.js、Python、Git 以及各种新兴的高级 AI 智能体命令行（如 Claude Code、Kimi CLI、MiniMax Code、Aider 等）。
-3. **文件流转受阻**：无法使用 SCP / SFTP / FTP 或 U 盘自由传输数据。
-4. **但办公机往往只有一个口子是畅通的**：**标准的 Web 浏览器，能访问 HTTP/HTTPS 网页。**
-
-### CLI Web Deck 的解题思路
-**“一台 VPS，只要有浏览器，处处皆是开发机与 AI 超算。”**
-
-用户只需要一台能够联网的 VPS 云服务器（或者一台有公网固定 IP / 域名的主机），在上面运行 `cli-web-deck`：
-* **单端口穿透**：网页界面、终端 WebSocket、文件拖拽上传与下载全部跑在**单个 HTTP 端口**上。在封闭网络中无需申请多端口开放，公网 IP 直连或域名反代均可无缝访问。
-* **双向文件拖拽交互**：受限办公机里的 Excel、需求文档直接往浏览器网页里一拖，瞬间流式写入远端工作区；Agent 生成的报表、代码、PPT 成果在网页侧边栏直接一键下载。
-* **tmux 会话永续**：办公电脑合盖下班、网络突然波动、网页误关闭，远端的复杂大模型推理和批量计算仍在后台平稳运行；重新打开浏览器瞬间接回原现场。
-
-### 常用运行示例
-```bash
-# 1. 最基础：把 Linux Bash 终端直接搬上浏览器
-cli-web-deck --cmd "bash" --port 8080
-
-# 2. 运行 Kimi / MiniMax / Claude 等 AI Agent，指定独立工作区
-cli-web-deck --cmd "kimi" --port 8010 --workspace /data/kimi-workspace
-
-# 3. 运行 Python 交互式数据分析环境，并开启基础账号密码认证
-cli-web-deck --cmd "python3 -m IPython" --port 8888 --auth "admin:myPassword123"
-```
+1. **Authentication**: When exposing CLI Web Deck to public networks or the Internet, always enable `--auth` or place the service behind a secure reverse proxy with TLS/HTTPS.
+2. **Compliance & Disclaimer**: CLI Web Deck is distributed under the MIT License as an open-source productivity utility. It is intended to streamline remote computing and terminal accessibility across lightweight devices. Users are responsible for adhering to their organization's IT and data security policies when accessing remote hosts. The author(s) assume no liability for misuse.
 
 ---
 
 ## 📄 License
 
-MIT License © 2026 HankGuo
+Released under the [MIT License](LICENSE).
