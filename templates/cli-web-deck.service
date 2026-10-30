@@ -1,0 +1,15 @@
+[Unit]
+Description=CLI Web Deck Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/local/bin/cli-web-deck --cmd "bash" --port 8080 --workspace /home/ubuntu/workspace
+Restart=always
+RestartSec=3
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:$PATH
+
+[Install]
+WantedBy=multi-user.target

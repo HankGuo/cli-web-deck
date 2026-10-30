@@ -1,0 +1,27 @@
+{
+  "name": "cli-web-deck",
+  "version": "1.0.0",
+  "description": "Universal Web Console & File Management Deck for any CLI tool",
+  "main": "src/server.js",
+  "bin": {
+    "cli-web-deck": "bin/cli-web-deck"
+  },
+  "scripts": {
+    "start": "node bin/cli-web-deck"
+  },
+  "keywords": [
+    "cli",
+    "ttyd",
+    "tmux",
+    "web-terminal",
+    "web-console",
+    "ai-agent",
+    "file-upload",
+    "developer-tools"
+  ],
+  "author": "HankGuo",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

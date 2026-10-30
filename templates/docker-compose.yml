@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  cli-web-deck:
+    build: .
+    container_name: cli-web-deck
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./workspace:/workspace
+    environment:
+      - PORT=8080
+    command: ["cli-web-deck", "--cmd", "bash", "--port", "8080", "--workspace", "/workspace"]

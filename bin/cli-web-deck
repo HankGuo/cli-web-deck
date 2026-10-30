@@ -1,0 +1,126 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const fs = require('fs');
+const SessionManager = require('../src/session');
+const WebDeckServer = require('../src/server');
+
+function parseArgs(args) {
+  const options = {
+    cmd: process.env.SHELL || 'bash',
+    port: 8080,
+    host: '0.0.0.0',
+    workspace: process.cwd(),
+    session: null,
+    title: 'CLI Web Deck',
+    auth: null,
+    internalPort: 39876
+  };
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--cmd' || arg === '-c') {
+      options.cmd = args[++i];
+    } else if (arg === '--port' || arg === '-p') {
+      options.port = parseInt(args[++i], 10);
+    } else if (arg === '--host' || arg === '-h') {
+      options.host = args[++i];
+    } else if (arg === '--workspace' || arg === '-w') {
+      options.workspace = path.resolve(args[++i]);
+    } else if (arg === '--session' || arg === '-s') {
+      options.session = args[++i];
+    } else if (arg === '--title' || arg === '-t') {
+      options.title = args[++i];
+    } else if (arg === '--auth' || arg === '-a') {
+      options.auth = args[++i]; // e.g. "admin:password"
+    } else if (arg === '--help') {
+      showHelp();
+      process.exit(0);
+    }
+  }
+
+  if (!options.session) {
+    const cleanCmd = options.cmd.split(' ')[0].replace(/[^a-zA-Z0-9_-]/g, '');
+    options.session = `deck-${cleanCmd}-${options.port}`;
+  }
+
+  // Derive an internal port that doesn't conflict
+  options.internalPort = options.port + 10000;
+  if (options.internalPort > 65535) options.internalPort = 42000;
+
+  return options;
+}
+
+function showHelp() {
+  console.log(`
+CLI Web Deck · Universal Browser Deck for Any CLI Command
+Usage: cli-web-deck [options]
+
+Options:
+  -c, --cmd <command>       The CLI command to run (e.g. "kimi", "agy", "bash", "python3") [default: "$SHELL"]
+  -p, --port <number>       Public port for web access (IP or domain) [default: 8080]
+  -w, --workspace <path>    Working directory for file uploads and execution [default: current dir]
+  -t, --title <name>        Custom application title in the web header [default: "CLI Web Deck"]
+  -a, --auth <user:pass>    Enable HTTP Basic Auth protection (e.g. "admin:secret") [default: none]
+  -s, --session <name>      tmux session name [default: auto-generated]
+  -h, --host <ip>           Host to bind to [default: "0.0.0.0"]
+      --help                Show this help message
+
+Examples:
+  cli-web-deck --cmd "kimi" --port 8010 --workspace /data/kimi
+  cli-web-deck --cmd "python3 -m IPython" --port 8888
+  cli-web-deck --cmd "bash" --port 8080 --auth "admin:pass123"
+`);
+}
+
+function main() {
+  const options = parseArgs(process.argv.slice(2));
+
+  // Ensure workspace exists
+  if (!fs.existsSync(options.workspace)) {
+    fs.mkdirSync(options.workspace, { recursive: true });
+  }
+
+  // Init session manager
+  const sessionManager = new SessionManager({
+    sessionName: options.session,
+    command: options.cmd,
+    workspace: options.workspace,
+    internalPort: options.internalPort
+  });
+
+  try {
+    sessionManager.checkPrerequisites();
+  } catch (err) {
+    console.error(`\n❌ Error: ${err.message}\n`);
+    process.exit(1);
+  }
+
+  // Start internal TTYD attached to persistent tmux
+  sessionManager.startTTYD();
+
+  // Start unified web deck server (serving web UI, upload API, and proxying ttyd)
+  const server = new WebDeckServer({
+    port: options.port,
+    host: options.host,
+    workspace: options.workspace,
+    command: options.cmd,
+    title: options.title,
+    auth: options.auth,
+    sessionManager
+  });
+
+  server.start();
+
+  // Graceful shutdown
+  const cleanup = () => {
+    console.log('\n[CLI Web Deck] Shutting down...');
+    sessionManager.stop();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+}
+
+main();
