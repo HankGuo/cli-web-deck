@@ -1,5 +1,9 @@
 # CLI Web Deck 🚀
 
+> **现在能干什么**｜把任意一台跑着 CLI Agent 的机器（Claude Code / Codex / Kimi Code / MiniMax Code / Aider…）变成浏览器可访问的个人工作台：完整浏览器终端（ANSI 颜色、光标控制、流式 token）、**双向拖拽**投喂文件与取回产物、`tmux` 会话持久化（合盖断网不中断）。
+> **30 秒跑起来**｜`./bin/cli-web-deck --cmd "claude" --port 8080 --workspace ~/projects/ai-work` → 浏览器打开 `http://localhost:8080`。
+> **谁在用**｜**暂无外部使用者反馈** —— 欢迎第一个 issue。
+
 <div align="center">
 
 **Turn Any Machine Where Your Favorite CLI Agents Live into a Personal Web Workspace**  
